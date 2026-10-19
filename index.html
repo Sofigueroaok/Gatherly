@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ritual | Panel de Administración</title>
+  <!-- Google Fonts & Iconos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Supabase JS & Vue 3 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <!-- Modal Configuración API Supabase (si no está configurada) -->
+    <!-- <div class="credentials-bar" v-if="!isConfigured">
+      <div class="credentials-content">
+        <i class="bi bi-shield-lock"></i>
+        <span>Ingresa las credenciales de tu proyecto Supabase:</span>
+        <input type="text" v-model="supabaseUrl" placeholder="Supabase Project URL" />
+        <input type="password" v-model="supabaseKey" placeholder="Supabase Anon Key" />
+        <button class="btn btn-primary btn-sm" @click="initSupabase">Conectar</button>
+      </div>
+    </div> -->
+
+    <!-- PANTALLA DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+    <div v-if="!currentUser && isConfigured" class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <span class="brand-leaf"><i class="bi bi-flower1"></i></span>
+          <h2>Ritual</h2>
+          <small>Cosmética Natural</small>
+        </div>
+
+        <div class="auth-tabs">
+          <button :class="{ active: authMode === 'login' }" @click="authMode = 'login'">Ingresar</button>
+          <button :class="{ active: authMode === 'register' }" @click="authMode = 'register'">Registrarse</button>
+        </div>
+
+        <!-- Alerta en Auth -->
+        <transition name="fade">
+          <div v-if="notification.show" :class="['alert', 'alert-' + notification.type]">
+            <i :class="notification.type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+            {{ notification.message }}
+          </div>
+        </transition>
+
+        <!-- Formulario Iniciar Sesión -->
+        <form v-if="authMode === 'login'" @submit.prevent="handleLogin" class="auth-form">
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" v-model="authForm.email" required placeholder="tu@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" v-model="authForm.password" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
+            <i class="bi bi-box-arrow-in-right" v-if="!loading"></i>
+            {{ loading ? 'Ingresando...' : 'Iniciar Sesión' }}
+          </button>
+        </form>
+
+        <!-- Formulario Registrarse -->
+        <form v-if="authMode === 'register'" @submit.prevent="handleRegister" class="auth-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input type="text" v-model="authForm.nombre" required placeholder="Lucía" />
+            </div>
+            <div class="form-group">
+              <label>Apellido *</label>
+              <input type="text" v-model="authForm.apellido" required placeholder="Gómez" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Correo Electrónico *</label>
+            <input type="email" v-model="authForm.email" required placeholder="tu@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Contraseña *</label>
+            <input type="password" v-model="authForm.password" minlength="6" required placeholder="Mínimo 6 caracteres" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="number" v-model.number="authForm.telefono" placeholder="1122334455" />
+            </div>
+            <div class="form-group">
+              <label>Dirección</label>
+              <input type="text" v-model="authForm.direccion" placeholder="Calle 123" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
+            <i class="bi bi-person-plus" v-if="!loading"></i>
+            {{ loading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANEL PRINCIPAL (USUARIO AUTENTICADO) -->
+    <template v-else-if="currentUser && isConfigured">
+      <!-- Barra lateral -->
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-leaf"><i class="bi bi-flower1"></i></span>
+          <div>
+            <h2>Ritual</h2>
+            <small>Cosmética Natural</small>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <button :class="{ active: currentTab === 'productos' }" @click="currentTab = 'productos'">
+            <i class="bi bi-box-seam"></i> Productos
+          </button>
+          <button :class="{ active: currentTab === 'categorias' }" @click="currentTab = 'categorias'">
+            <i class="bi bi-tags"></i> Categorías
+          </button>
+          <button :class="{ active: currentTab === 'pedidos' }" @click="currentTab = 'pedidos'">
+            <i class="bi bi-bag-check"></i> Pedidos
+          </button>
+          <button :class="{ active: currentTab === 'usuarios' }" @click="currentTab = 'usuarios'">
+            <i class="bi bi-people"></i> Usuarios
+          </button>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-info">
+            <i class="bi bi-person-circle"></i>
+            <div>
+              <p class="user-name">{{ currentUser.email }}</p>
+              <span class="user-role">Sesión Activa</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm btn-logout" @click="handleLogout" title="Cerrar sesión">
+            <i class="bi bi-box-arrow-left"></i> Salir
+          </button>
+        </div>
+      </aside>
+
+      <!-- Contenido Principal -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="top-nav">
+          <div class="page-title">
+            <h1>{{ getTabTitle() }}</h1>
+            <p>{{ getTabSubtitle() }}</p>
+          </div>
+          <div class="nav-actions">
+            <button v-if="currentTab === 'productos'" class="btn btn-primary" @click="openModal('producto')">
+              <i class="bi bi-plus-lg"></i> Nuevo Producto
+            </button>
+            <button v-if="currentTab === 'categorias'" class="btn btn-primary" @click="openModal('categoria')">
+              <i class="bi bi-plus-lg"></i> Nueva Categoría
+            </button>
+            <button v-if="currentTab === 'usuarios'" class="btn btn-primary" @click="openModal('usuario')">
+              <i class="bi bi-person-plus"></i> Nuevo Usuario
+            </button>
+            <button class="btn btn-outline" @click="fetchData(currentTab)" :disabled="loading">
+              <i class="bi bi-arrow-clockwise" :class="{ 'spin': loading }"></i> Actualizar
+            </button>
+          </div>
+        </header>
+
+        <!-- Mensajes de alerta -->
+        <transition name="fade">
+          <div v-if="notification.show" :class="['alert', 'alert-' + notification.type]">
+            <i :class="notification.type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+            {{ notification.message }}
+          </div>
+        </transition>
+
+        <!-- TAB: PRODUCTOS -->
+        <section v-if="currentTab === 'productos'" class="panel-section">
+          <div class="card table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Marca</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Vencimiento</th>
+                  <th class="actions-header">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="loading && productos.length === 0">
+                  <td colspan="8" class="text-center">Cargando productos...</td>
+                </tr>
+                <tr v-else-if="productos.length === 0">
+                  <td colspan="8" class="text-center text-muted">No se encontraron productos registrados.</td>
+                </tr>
+                <tr v-for="item in productos" :key="item.id_producto">
+                  <td>#{{ item.id_producto }}</td>
+                  <td class="font-bold">{{ item.nombre }}</td>
+                  <td><span class="badge">{{ item.marca || 'N/A' }}</span></td>
+                  <td>{{ getCategoryName(item.id_categoria) }}</td>
+                  <td class="price">${{ Number(item.precio).toFixed(2) }}</td>
+                  <td>
+                    <span :class="['stock-pill', item.stock < 5 ? 'stock-low' : 'stock-ok']">
+                      {{ item.stock }} un.
+                    </span>
+                  </td>
+                  <td>{{ item.fecha_vencimiento || '-' }}</td>
+                  <td class="actions-cell">
+                    <button class="btn-icon edit" @click="editItem('producto', item)" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-icon delete" @click="deleteItem('producto', item.id_producto)" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB: CATEGORÍAS -->
+        <section v-if="currentTab === 'categorias'" class="panel-section">
+          <div class="card table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre de Categoría</th>
+                  <th>Descripción</th>
+                  <th class="actions-header">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="loading && categorias.length === 0">
+                  <td colspan="4" class="text-center">Cargando categorías...</td>
+                </tr>
+                <tr v-else-if="categorias.length === 0">
+                  <td colspan="4" class="text-center text-muted">No hay categorías añadidas.</td>
+                </tr>
+                <tr v-for="cat in categorias" :key="cat.id_categoria">
+                  <td>#{{ cat.id_categoria }}</td>
+                  <td class="font-bold">{{ cat.nombre }}</td>
+                  <td class="text-muted">{{ cat.descripcion || 'Sin descripción' }}</td>
+                  <td class="actions-cell">
+                    <button class="btn-icon edit" @click="editItem('categoria', cat)" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-icon delete" @click="deleteItem('categoria', cat.id_categoria)" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB: PEDIDOS -->
+        <section v-if="currentTab === 'pedidos'" class="panel-section">
+          <div class="card table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID Pedido</th>
+                  <th>ID Usuario</th>
+                  <th>Fecha</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th class="actions-header">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="loading && pedidos.length === 0">
+                  <td colspan="6" class="text-center">Cargando pedidos...</td>
+                </tr>
+                <tr v-else-if="pedidos.length === 0">
+                  <td colspan="6" class="text-center text-muted">No hay pedidos registrados en la tienda.</td>
+                </tr>
+                <tr v-for="ped in pedidos" :key="ped.id_pedido">
+                  <td>#{{ ped.id_pedido }}</td>
+                  <td>Usuario #{{ ped.id_usuario }}</td>
+                  <td>{{ ped.fecha }}</td>
+                  <td class="price">${{ Number(ped.total || 0).toFixed(2) }}</td>
+                  <td>
+                    <span class="status-badge" :class="ped.estado ? ped.estado.toLowerCase() : ''">
+                      {{ ped.estado || 'Pendiente' }}
+                    </span>
+                  </td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-outline" @click="updatePedidoStatus(ped)">
+                      Cambiar estado
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB: USUARIOS -->
+        <section v-if="currentTab === 'usuarios'" class="panel-section">
+          <div class="card table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre Completo</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Dirección</th>
+                  <th>Rol</th>
+                  <th class="actions-header">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="loading && usuarios.length === 0">
+                  <td colspan="7" class="text-center">Cargando usuarios...</td>
+                </tr>
+                <tr v-else-if="usuarios.length === 0">
+                  <td colspan="7" class="text-center text-muted">No se registraron usuarios.</td>
+                </tr>
+                <tr v-for="user in usuarios" :key="user.id_usuario">
+                  <td>#{{ user.id_usuario }}</td>
+                  <td class="font-bold">{{ user.nombre }} {{ user.apellido }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.telefono || '-' }}</td>
+                  <td>{{ user.direccion || '-' }}</td>
+                  <td><span class="badge">Rol: {{ user.id_rol || 1 }}</span></td>
+                  <td class="actions-cell">
+                    <button class="btn-icon edit" @click="editItem('usuario', user)" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-icon delete" @click="deleteItem('usuario', user.id_usuario)" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <!-- Modal CRUD Genérico -->
+      <div class="modal-backdrop" v-if="modal.visible" @click.self="closeModal">
+        <div class="modal-box">
+          <div class="modal-header">
+            <h3>{{ modal.isEdit ? 'Editar ' : 'Nuevo ' }}{{ modal.type === 'producto' ? 'Producto' : modal.type === 'categoria' ? 'Categoría' : 'Usuario' }}</h3>
+            <button class="btn-close" @click="closeModal">&times;</button>
+          </div>
+
+          <div class="modal-body">
+            <!-- Form Producto -->
+            <form v-if="modal.type === 'producto'" @submit.prevent="saveProducto">
+              <div class="form-group">
+                <label>Nombre del Producto *</label>
+                <input type="text" v-model="formProducto.nombre" required placeholder="Ej: Sérum Facial Botánico" />
+              </div>
+              <div class="form-group">
+                <label>Descripción</label>
+                <textarea v-model="formProducto.descripcion" rows="3" placeholder="Ingredientes y propiedades..."></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Precio ($) *</label>
+                  <input type="number" step="0.01" v-model.number="formProducto.precio" required />
+                </div>
+                <div class="form-group">
+                  <label>Stock *</label>
+                  <input type="number" v-model.number="formProducto.stock" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Marca</label>
+                  <input type="text" v-model="formProducto.marca" placeholder="Ej: Ritual Pureza" />
+                </div>
+                <div class="form-group">
+                  <label>Categoría</label>
+                  <select v-model="formProducto.id_categoria">
+                    <option :value="null">-- Seleccionar categoría --</option>
+                    <option v-for="cat in categorias" :key="cat.id_categoria" :value="cat.id_categoria">
+                      {{ cat.nombre }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Fecha de Vencimiento</label>
+                <input type="date" v-model="formProducto.fecha_vencimiento" />
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" @click="closeModal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" :disabled="loading">Guardar</button>
+              </div>
+            </form>
+
+            <!-- Form Categoría -->
+            <form v-if="modal.type === 'categoria'" @submit.prevent="saveCategoria">
+              <div class="form-group">
+                <label>Nombre de Categoría *</label>
+                <input type="text" v-model="formCategoria.nombre" required placeholder="Ej: Jabones Artesanales" />
+              </div>
+              <div class="form-group">
+                <label>Descripción</label>
+                <textarea v-model="formCategoria.descripcion" rows="3" placeholder="Detalle sobre la categoría..."></textarea>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" @click="closeModal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" :disabled="loading">Guardar</button>
+              </div>
+            </form>
+
+            <!-- Form Usuario (Creación / Edición directa) -->
+            <form v-if="modal.type === 'usuario'" @submit.prevent="saveUsuario">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nombre *</label>
+                  <input type="text" v-model="formUsuario.nombre" required />
+                </div>
+                <div class="form-group">
+                  <label>Apellido *</label>
+                  <input type="text" v-model="formUsuario.apellido" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Email *</label>
+                <input type="email" v-model="formUsuario.email" required />
+              </div>
+              <div class="form-group" v-if="!modal.isEdit">
+                <label>Contraseña *</label>
+                <input type="password" v-model="formUsuario.contrasena" required minlength="6" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Teléfono</label>
+                  <input type="number" v-model.number="formUsuario.telefono" />
+                </div>
+                <div class="form-group">
+                  <label>ID Rol</label>
+                  <input type="number" v-model.number="formUsuario.id_rol" placeholder="1" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Dirección</label>
+                <input type="text" v-model="formUsuario.direccion" />
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" @click="closeModal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" :disabled="loading">Guardar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="supabase.js"></script>
+</body>
+</html>
