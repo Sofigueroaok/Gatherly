@@ -1,0 +1,858 @@
+/* ========================================
+   GATHERLY — IDENTIDAD VISUAL
+======================================== */
+
+/* FUENTES */
+
+@font-face {
+  font-family: "Busorama";
+  src: url("./assets/fonts/ITC-Busorama.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Bold";
+  src: url("./assets/fonts/SF-Bold.OTF") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("./assets/fonts/SpaceGrotesk.ttf") format("truetype");
+  font-display: swap;
+}
+
+
+/* VARIABLES */
+
+:root {
+  --papel: #f2e9d9;
+  --tinta: #30231e;
+  --naranja: #bb592f;
+  --naranja-oscuro: #a54a29;
+  --linea: #d1c3ad;
+
+  --intensidad-grano: 0.16;
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  color: var(--tinta);
+  background: #ded3bd;
+
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* RESET */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 280px;
+}
+
+body {
+  margin: 0;
+}
+
+body.panel-gatherly-abierto {
+  overflow: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--naranja);
+  outline-offset: 3px;
+}
+
+
+/* ========================================
+   CONTENEDOR MOBILE FIRST
+======================================== */
+
+.gatherly {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 480px;
+  min-height: 100svh;
+
+  margin: 0 auto;
+  overflow: hidden;
+
+  background: var(--papel);
+}
+
+
+/* ========================================
+   TEXTURA GLOBAL DE IMPRESIÓN
+======================================== */
+
+.gatherly::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 10;
+
+  pointer-events: none;
+
+  opacity: var(--intensidad-grano);
+
+  mix-blend-mode: multiply;
+
+  background-image: url(
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.7'/%3E%3C/svg%3E"
+  );
+
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+
+/* ========================================
+   PORTADA
+======================================== */
+
+.portada {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  min-height: 100svh;
+
+  overflow: hidden;
+}
+
+
+/* FOTOGRAFÍA */
+
+.portada-imagen {
+  position: absolute;
+
+  top: 0;
+  left: -9%;
+  z-index: 0;
+
+  display: block;
+
+  width: 109.5%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center 36%;
+}
+
+
+/* VIÑETA SUAVE */
+
+.portada-vineta {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(241, 230, 207, 0.03) 0%,
+    transparent 28%,
+    transparent 70%,
+    rgba(39, 25, 16, 0.12) 100%
+  );
+}
+
+
+/* ========================================
+   MARCO NARANJA EDITORIAL
+======================================== */
+
+.portada::after {
+  content: "";
+
+  position: absolute;
+  z-index: 3;
+
+  top: 12px;
+  right: 11px;
+  bottom: 7px;
+  left: 11px;
+
+  border: 2px solid rgba(178, 79, 40, 0.62);
+  border-radius: 12px;
+
+  pointer-events: none;
+}
+
+
+/* ========================================
+   CONTENIDO DE PORTADA
+======================================== */
+
+.portada-contenido {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-height: 100svh;
+
+  padding:
+    22px 22px
+    max(14px, env(safe-area-inset-bottom));
+}
+
+
+/* ========================================
+   CABECERA
+======================================== */
+
+.portada-cabecera {
+  text-align: center;
+}
+
+.edicion {
+  margin: 0 0 10px;
+
+  font-family: "SF Bold", Arial, sans-serif;
+  font-size: 9px;
+
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+
+  color: var(--tinta);
+}
+
+.edicion span {
+  padding: 0 4px;
+  color: var(--naranja);
+}
+
+
+/* LOGOTIPO */
+
+.marca {
+  margin: 0;
+
+  font-family: "Busorama", Georgia, serif;
+  font-size: clamp(62px, 20.5vw, 99px);
+  font-weight: 400;
+
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+
+  color: var(--tinta);
+}
+
+
+/* ========================================
+   ACCESOS
+======================================== */
+
+.portada-acciones {
+  width: 100%;
+  margin-top: auto;
+}
+
+.acciones-fila {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 26px;
+
+  width: 100%;
+  max-width: 390px;
+
+  margin: 0 auto;
+}
+
+
+/* ========================================
+   BOTONES GLASS
+======================================== */
+
+.boton-glass {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  border: none;
+  border-radius: 3px;
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+
+  line-height: 1.2;
+  letter-spacing: 0.15em;
+  text-align: center;
+  white-space: nowrap;
+
+  backdrop-filter:
+    blur(28px)
+    saturate(145%);
+
+  -webkit-backdrop-filter:
+    blur(28px)
+    saturate(145%);
+
+  box-shadow:
+    0 8px 22px rgba(48, 29, 19, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  transition:
+    background 220ms ease,
+    box-shadow 220ms ease,
+    transform 180ms ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* ========================================
+   CREAR CUENTA — NEGRO GLASS
+======================================== */
+
+.boton-glass-principal {
+  background: linear-gradient(
+    120deg,
+    rgba(18, 20, 20, 0.56) 0%,
+    rgba(45, 37, 32, 0.43) 100%
+  );
+
+  color: #fff8ed;
+
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.28);
+}
+
+
+/* ========================================
+   INGRESAR — CREMA GLASS
+======================================== */
+
+.boton-glass-secundario {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(251, 235, 207, 0.32) 100%
+  );
+
+  color: var(--tinta);
+
+  text-shadow:
+    0 1px 3px rgba(255, 250, 231, 0.3);
+}
+
+
+/* INTERACCIONES */
+
+@media (hover: hover) {
+  .boton-glass-principal:hover {
+    background: linear-gradient(
+      120deg,
+      rgba(18, 20, 20, 0.68),
+      rgba(45, 37, 32, 0.55)
+    );
+  }
+
+  .boton-glass-secundario:hover {
+    background: rgba(255, 248, 229, 0.55);
+  }
+}
+
+.boton-glass:active {
+  transform: translateY(2px);
+
+  box-shadow:
+    0 2px 9px rgba(48, 29, 19, 0.08),
+    inset 0 2px 6px rgba(48, 29, 19, 0.07);
+}
+
+
+/* ========================================
+   FONDO OSCURECIDO
+======================================== */
+
+.velo-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  width: 100%;
+
+  border: none;
+
+  background: rgba(36, 24, 18, 0.4);
+
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.velo-enter-active,
+.velo-leave-active {
+  transition: opacity 350ms ease;
+}
+
+.velo-enter-from,
+.velo-leave-to {
+  opacity: 0;
+}
+
+
+/* ========================================
+   PANEL DESLIZABLE
+======================================== */
+
+.panel-acceso {
+  position: absolute;
+  z-index: 5;
+
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  max-height: 92dvh;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  padding:
+    0 24px
+    calc(24px + env(safe-area-inset-bottom));
+
+  border-radius: 25px 25px 0 0;
+
+  background: var(--papel);
+  color: var(--tinta);
+
+  box-shadow:
+    0 -16px 60px rgba(32, 19, 12, 0.25);
+
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel-acceso::-webkit-scrollbar {
+  display: none;
+}
+
+.panel-login {
+  max-height: 85dvh;
+}
+
+.panel-registro {
+  max-height: 92dvh;
+}
+
+
+/* ANIMACIÓN SWIPE UP */
+
+.deslizar-enter-active {
+  transition:
+    transform 530ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.deslizar-leave-active {
+  transition:
+    transform 320ms cubic-bezier(0.55, 0, 1, 0.55);
+}
+
+.deslizar-enter-from,
+.deslizar-leave-to {
+  transform: translateY(105%);
+}
+
+
+/* TIRADOR */
+
+.panel-zona-gesto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 33px;
+
+  touch-action: pan-y;
+}
+
+.panel-tirador {
+  width: 38px;
+  height: 4px;
+
+  border-radius: 4px;
+
+  background: #bcab97;
+}
+
+
+/* CABECERA DEL PANEL */
+
+.panel-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 1px 0 13px;
+
+  border-bottom: 1px solid var(--linea);
+}
+
+.panel-logo {
+  font-family: "Busorama", Georgia, serif;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.panel-cerrar {
+  display: grid;
+  place-items: center;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  border: 1px solid var(--linea);
+  border-radius: 50%;
+
+  background: transparent;
+  color: var(--tinta);
+
+  font-family: Arial, sans-serif;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.panel-cerrar:hover {
+  background: #e6d8c5;
+}
+
+
+/* ========================================
+   TEXTOS DEL PANEL
+======================================== */
+
+.panel-intro {
+  margin: 27px 0 25px;
+}
+
+.panel-numero {
+  margin: 0 0 12px;
+
+  color: var(--naranja);
+
+  font-family: "SF Bold", Arial, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+
+.panel-titulo {
+  max-width: 380px;
+
+  margin: 0;
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: clamp(35px, 9.3vw, 46px);
+  font-weight: 500;
+
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.panel-subtitulo {
+  max-width: 340px;
+
+  margin: 13px 0 0;
+
+  color: #68584d;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* ========================================
+   FORMULARIOS
+======================================== */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+
+  gap: 17px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.campo label {
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.campo input {
+  width: 100%;
+  min-width: 0;
+  min-height: 51px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #b9a995;
+  border-radius: 3px;
+
+  background: #fffaf0;
+  color: var(--tinta);
+
+  font-size: 16px;
+
+  transition: border-color 180ms ease;
+}
+
+.campo input::placeholder {
+  color: #857666;
+  opacity: 1;
+}
+
+.campo input:focus {
+  border-color: var(--naranja);
+}
+
+
+/* CONTRASEÑA */
+
+.password-contenedor {
+  position: relative;
+}
+
+.password-contenedor input {
+  padding-right: 85px;
+}
+
+.ver-password {
+  position: absolute;
+
+  top: 4px;
+  right: 4px;
+
+  min-width: 72px;
+  min-height: 43px;
+
+  padding: 6px;
+
+  border: none;
+
+  background: transparent;
+  color: var(--tinta);
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+
+/* BOTÓN DEL FORMULARIO */
+
+.boton-enviar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 49px;
+
+  margin-top: 7px;
+  padding: 13px 18px;
+
+  border: none;
+  border-radius: 3px;
+
+  background: var(--naranja);
+  color: #fff7e9;
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.boton-enviar:hover {
+  background: var(--naranja-oscuro);
+}
+
+.boton-enviar:active {
+  transform: translateY(1px);
+}
+
+
+/* CAMBIAR DE FORMULARIO */
+
+.panel-cambio {
+  margin: 18px 0 0;
+
+  font-size: 14px;
+  text-align: center;
+}
+
+.panel-cambio button {
+  min-height: 44px;
+
+  padding: 7px 3px;
+
+  border: none;
+
+  background: transparent;
+  color: var(--naranja-oscuro);
+
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+
+/* MENSAJE DEMO */
+
+.mensaje {
+  margin: 17px 0 0;
+  padding: 14px;
+
+  border-left: 3px solid var(--naranja);
+
+  background: #e7dac5;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* TRANSICIÓN LOGIN / REGISTRO */
+
+.cambiar-formulario-enter-active,
+.cambiar-formulario-leave-active {
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.cambiar-formulario-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.cambiar-formulario-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+/* ESCRITORIO */
+
+@media (min-width: 700px) {
+  .gatherly {
+    box-shadow:
+      0 14px 65px rgba(48, 35, 30, 0.18);
+  }
+}
+
+
+/* CELULARES ANGOSTOS */
+
+@media (max-width: 360px) {
+  .portada-contenido {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .marca {
+    font-size: 19vw;
+  }
+
+  .edicion {
+    font-size: 8px;
+  }
+
+  .acciones-fila {
+    gap: 15px;
+  }
+
+  .boton-glass {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding-inline: 8px;
+  }
+
+  .panel-acceso {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
+
+
+/* PANTALLAS DE POCA ALTURA */
+
+@media (max-height: 560px) {
+  .portada-contenido {
+    padding-top: 15px;
+  }
+
+  .marca {
+    font-size: clamp(54px, 18vw, 85px);
+  }
+
+  .panel-login,
+  .panel-registro {
+    max-height: 95dvh;
+  }
+}
+
+
+/* ACCESIBILIDAD */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
