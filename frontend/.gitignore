@@ -25,7 +25,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-
 .eslintcache
 
 # Cypress
@@ -37,3 +36,8 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Configuración local de Supabase
+.env
+.env.*
+!.env.example
