@@ -1,12 +1,53 @@
 <script setup>
-import { onBeforeUnmount, reactive, ref } from 'vue'
-import { categorias } from '../datos/categorias.js'
+import { computed, onMounted, onBeforeUnmount, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { supabase } from '../supabase.js'
 
-defineEmits(['volver'])
+const route = useRoute()
+const router = useRouter()
+const editando = computed(() => route.name === 'editar-producto')
 const datos = reactive({ nombre: '', categoria: '', descripcion: '', precio: '', ubicacion: '' })
+const categorias = ref([])
 const foto = ref('')
+const archivoFoto = ref(null)
+const fotoAnterior = ref('')
+const rutaAnterior = ref('')
 const errorFoto = ref('')
+const errorMsg = ref('')
+const cargando = ref(true)
+const enviando = ref(false)
 const vistaPrevia = ref(false)
+const nombreCategoria = computed(() => categorias.value.find(c => c.id_categoria === datos.categoria)?.nombre || '')
+
+// READ: cargar categorías y, al editar, el producto del usuario conectado.
+const cargarFormulario = async () => {
+  try {
+    cargando.value = true
+    errorMsg.value = ''
+    const { data, error } = await supabase.from('categoria').select('*').order('id_categoria')
+    if (error) throw error
+    categorias.value = data
+
+    if (editando.value) {
+      const { data: { user }, error: errorUsuario } = await supabase.auth.getUser()
+      if (errorUsuario) throw errorUsuario
+      if (!user) throw new Error('Primero iniciá sesión.')
+      const { data: producto, error: errorProducto } = await supabase.from('producto')
+        .select('*').eq('id_producto', route.params.id).eq('user_id', user.id).single()
+      if (errorProducto) throw errorProducto
+      Object.assign(datos, {
+        nombre: producto.nombre, categoria: producto.id_categoria,
+        descripcion: producto.descripcion, precio: producto.precio, ubicacion: producto.ubicacion
+      })
+      foto.value = fotoAnterior.value = producto.foto
+      rutaAnterior.value = producto.foto_ruta || ''
+    }
+  } catch (err) {
+    errorMsg.value = `No se pudo cargar el formulario: ${err.message}`
+  } finally {
+    cargando.value = false
+  }
+}
 
 function elegirFoto(evento) {
   const archivo = evento.target.files?.[0]
@@ -17,27 +58,86 @@ function elegirFoto(evento) {
     evento.target.value = ''
     return
   }
-  if (foto.value) URL.revokeObjectURL(foto.value)
+  if (foto.value.startsWith('blob:')) URL.revokeObjectURL(foto.value)
+  archivoFoto.value = archivo
   foto.value = URL.createObjectURL(archivo)
 }
 
 function revisar() {
+  if (cargando.value || enviando.value) return
   if (!foto.value) {
-    errorFoto.value = 'Agregá una foto para ver cómo quedaría tu publicación.'
+    errorFoto.value = 'Agregá una foto de tu producto.'
     return
   }
   vistaPrevia.value = true
+  errorMsg.value = ''
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-onBeforeUnmount(() => { if (foto.value) URL.revokeObjectURL(foto.value) })
+// CREATE / UPDATE: mismo patrón de la clase 9, con Storage para la foto.
+const guardarProducto = async () => {
+  if (enviando.value) return
+  let rutaNueva = ''
+  let guardado = false
+  try {
+    enviando.value = true
+    errorMsg.value = ''
+    const { data: { user }, error: errorUsuario } = await supabase.auth.getUser()
+    if (errorUsuario) throw errorUsuario
+    if (!user) throw new Error('Primero iniciá sesión.')
+
+    let fotoUrl = fotoAnterior.value
+    let fotoRuta = rutaAnterior.value
+    if (archivoFoto.value) {
+      const extensiones = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
+      rutaNueva = `${user.id}/${Date.now()}.${extensiones[archivoFoto.value.type]}`
+      const { error } = await supabase.storage.from('productos').upload(rutaNueva, archivoFoto.value)
+      if (error) throw error
+      fotoUrl = supabase.storage.from('productos').getPublicUrl(rutaNueva).data.publicUrl
+      fotoRuta = rutaNueva
+    }
+
+    const producto = {
+      nombre: datos.nombre, descripcion: datos.descripcion,
+      precio: String(datos.precio), id_categoria: datos.categoria,
+      ubicacion: datos.ubicacion, foto: fotoUrl, foto_ruta: fotoRuta, user_id: user.id
+    }
+    const consulta = editando.value
+      ? supabase.from('producto').update(producto).eq('id_producto', route.params.id).eq('user_id', user.id)
+      : supabase.from('producto').insert([producto])
+    const { data, error } = await consulta.select()
+    if (error) throw error
+    if (!data?.length) throw new Error('No se guardó el producto. Revisá los permisos de la cuenta.')
+    guardado = true
+
+    // Si cambió la foto, borrar la anterior después de guardar correctamente.
+    let fotoPendiente = false
+    if (rutaNueva && rutaAnterior.value.startsWith(`${user.id}/`)) {
+      const { error } = await supabase.storage.from('productos').remove([rutaAnterior.value])
+      fotoPendiente = !!error
+    }
+    router.replace({ name: 'mis-publicaciones', query: { guardado: '1', ...(fotoPendiente ? { fotoPendiente: '1' } : {}) } })
+  } catch (err) {
+    errorMsg.value = `No se pudo guardar el producto: ${err.message}`
+    // Si no se guardó la fila, intentar limpiar la foto recién subida.
+    if (rutaNueva && !guardado) {
+      const { error } = await supabase.storage.from('productos').remove([rutaNueva])
+      if (error) errorMsg.value += ' La foto quedó pendiente de limpieza.'
+    }
+  } finally {
+    enviando.value = false
+  }
+}
+
+onMounted(cargarFormulario)
+onBeforeUnmount(() => { if (foto.value.startsWith('blob:')) URL.revokeObjectURL(foto.value) })
 </script>
 
 <template>
   <section class="crear-producto">
     <header class="crear-encabezado">
-      <button type="button" @click="vistaPrevia ? vistaPrevia = false : $emit('volver')">← {{ vistaPrevia ? 'Editar' : 'Inicio' }}</button>
-      <span>{{ vistaPrevia ? 'VISTA PREVIA' : 'NUEVA PUBLICACIÓN' }}</span>
+      <button type="button" :disabled="enviando" @click="vistaPrevia ? vistaPrevia = false : router.push({ name: 'inicio' })">← {{ vistaPrevia ? 'Editar' : 'Inicio' }}</button>
+      <span>{{ vistaPrevia ? 'VISTA PREVIA' : editando ? 'EDITAR PUBLICACIÓN' : 'NUEVA PUBLICACIÓN' }}</span>
     </header>
 
     <template v-if="!vistaPrevia">
@@ -61,7 +161,7 @@ onBeforeUnmount(() => { if (foto.value) URL.revokeObjectURL(foto.value) })
         <label for="producto-categoria">CATEGORÍA</label>
         <select id="producto-categoria" v-model="datos.categoria" required>
           <option disabled value="">Elegí una categoría</option>
-          <option v-for="categoria in categorias" :key="categoria.nombre" :value="categoria.nombre">{{ categoria.nombre }}</option>
+          <option v-for="categoria in categorias" :key="categoria.id_categoria" :value="categoria.id_categoria">{{ categoria.nombre }}</option>
         </select>
 
         <label for="producto-descripcion">CONTANOS UN POCO MÁS</label>
@@ -73,7 +173,7 @@ onBeforeUnmount(() => { if (foto.value) URL.revokeObjectURL(foto.value) })
         <label for="producto-ubicacion">¿POR DÓNDE SE RETIRA?</label>
         <input id="producto-ubicacion" v-model.trim="datos.ubicacion" placeholder="Tu barrio o localidad" required maxlength="100" />
 
-        <button class="crear-principal" type="submit">Ver vista previa <span aria-hidden="true">→</span></button>
+        <button class="crear-principal" type="submit" :disabled="cargando || enviando || !categorias.length">Ver vista previa <span aria-hidden="true">→</span></button>
       </form>
     </template>
 
@@ -82,16 +182,20 @@ onBeforeUnmount(() => { if (foto.value) URL.revokeObjectURL(foto.value) })
       <article class="producto-previa">
         <img :src="foto" :alt="datos.nombre" />
         <div>
-          <p class="crear-antetitulo">{{ datos.categoria }}</p>
+          <p class="crear-antetitulo">{{ nombreCategoria }}</p>
           <h1>{{ datos.nombre }}</h1>
           <p class="producto-precio">{{ Number(datos.precio).toLocaleString('es-AR') }} ARS <small>/ día</small></p>
           <p class="producto-ubicacion">{{ datos.ubicacion }}</p>
           <p class="producto-descripcion">{{ datos.descripcion }}</p>
         </div>
       </article>
-      <button class="crear-principal" type="button" @click="vistaPrevia = false">Seguir editando <span aria-hidden="true">↗</span></button>
-      <p class="crear-nota" role="status">Vista previa. Todavía no se publicó ni se guardó en la base de datos.</p>
+      <button class="crear-principal" type="button" :disabled="enviando" :aria-busy="enviando" @click="guardarProducto">
+        {{ enviando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Publicar producto' }} <span aria-hidden="true">→</span>
+      </button>
+      <button class="crear-editar" type="button" :disabled="enviando" @click="vistaPrevia = false">Seguir editando</button>
     </template>
+    <p v-if="cargando" class="crear-nota" role="status">Cargando datos…</p>
+    <p v-if="errorMsg" class="crear-error" role="alert">{{ errorMsg }}</p>
   </section>
 </template>
 
@@ -113,6 +217,8 @@ h1 { font: 28px/1.03 'ITC Avant Medium', sans-serif; letter-spacing: -.055em; ma
 .crear-formulario > input, select, textarea { width: 100%; font: 16px/1.3 'SF Regular', sans-serif; letter-spacing: -.01em; color: #211c18; border: 1px solid #cabcaa; border-radius: 3px; background: #ffffff60; padding: 14px 12px; margin-bottom: 23px; }
 textarea { resize: vertical; }
 .crear-principal { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 50px; background: #bb592f; color: white; padding: 15px 18px; border: 0; border-radius: 3px; font: 14px 'SF Medium', sans-serif; }
+.crear-editar { display: block; margin: 12px auto 0; min-height: 44px; border: 0; background: none; color: inherit; font: 14px 'SF Regular', sans-serif; text-decoration: underline; }
+button:disabled { opacity: .6; cursor: wait; }
 .crear-nota { font: 12px/1.4 'SF Regular', sans-serif; color: #665749; }
 .crear-error { color: #9e2c19; font: 13px 'SF Regular', sans-serif; }
 .producto-previa { margin: 22px 0 28px; }

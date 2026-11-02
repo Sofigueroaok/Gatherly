@@ -29,13 +29,17 @@ Abrir la dirección `Local` en la computadora. Para probar desde un celular cone
 
 | Archivo | Qué contiene |
 | --- | --- |
-| `src/App.vue` | Onboarding, registro, login y sesión. Los textos del onboarding están en `paginas`. |
+| `src/App.vue` | Contenedor de las pantallas del router. |
+| `src/router/index.js` | Rutas y control de sesión antes de entrar (clase 11). |
+| `src/views/AccesoView.vue` | Onboarding, registro y login. Los textos están en `paginas`. |
+| `src/views/InicioView.vue` | Usuario conectado y cierre de sesión. |
+| `src/views/MisProductosView.vue` | Listar, editar y eliminar publicaciones propias. |
 | `src/style.css` | Fuentes y estilos del onboarding y de acceso. |
 | `src/components/Inicio.vue` | Categorías y navegación del inicio. |
-| `src/datos/categorias.js` | Nombres, fotos y detalles de las categorías. También alimenta el selector del formulario. |
-| `src/components/ProductosInicio.vue` | Carruseles de productos de muestra. |
+| `src/datos/categorias.js` | Nombres, fotos y detalles de las categorías. El formulario carga las categorías de Supabase. |
+| `src/components/ProductosInicio.vue` | Publicaciones de Supabase y carruseles de muestra identificados. |
 | `src/components/PersonasInicio.vue` | Tarjetas de personas de muestra. |
-| `src/components/CrearProducto.vue` | Formulario y vista previa de un producto. |
+| `src/components/CrearProducto.vue` | Formulario, vista previa, subida de foto y creación/edición en Supabase. |
 | `src/supabase.js` | Cliente compartido de Supabase. |
 | `src/assets/` | Fotos, fuentes y logos en archivos SVG. |
 
@@ -46,19 +50,25 @@ Los estilos de cada componente están al final de su archivo, dentro de `<style 
 - **Registro:** crea la cuenta en Supabase Auth y solicita confirmar el correo.
 - **Login:** valida correo y contraseña, abre el inicio y restaura la sesión al volver a entrar.
 - **Cerrar sesión:** cierra el acceso del navegador actual.
-- **Crear producto:** permite completar los campos, elegir una foto y revisar una vista previa. Todavía no guarda en la tabla de productos ni sube fotos a Storage.
-- **Pendiente:** conectar productos reales, publicar, editar y eliminar productos, perfil y pedidos.
-- Apple, Google y recuperación de contraseña todavía no están conectados.
+- **Productos:** crear, listar, editar y eliminar en la tabla `producto`, con fotos en el bucket `productos`.
+- **Administrar:** en Mi cuenta → Mis publicaciones aparecen los objetos del usuario conectado.
+- **Pendiente:** perfil editable y pedidos; Apple, Google y recuperación de contraseña no están conectados.
 
-Los precios, personas, cantidades y publicaciones del inicio son datos de muestra. No indican cercanía ni popularidad calculadas.
+Los carruseles marcados como muestra y las personas usan datos de ejemplo. No indican cercanía ni popularidad calculadas. La sección Recién publicados carga datos reales.
 
-## Para conectar productos
+## Base de datos y clases
 
-Trabajar en `CrearProducto.vue`, usando el cliente exportado por `src/supabase.js`. El formulario agrupa sus campos en `datos`. La foto actual es una URL temporal para la vista previa; hay que conservar el archivo elegido para subirlo a Storage.
+El SQL de publicaciones se aplica una sola vez en Supabase. Agrega a `producto` los campos `user_id`, `nombre`, `ubicacion`, `foto_ruta` y `created_at`, las políticas de acceso y el bucket de fotos. Conserva las filas existentes y no modifica `usuario`.
 
-La integración debe usar la sesión del usuario y las tablas, funciones y políticas acordadas en Supabase. Este cambio de interfaz no modifica la base de datos.
+`user_id` guarda el identificador de Supabase Auth. La tabla antigua `usuario` tiene un identificador numérico distinto: todavía no se usa como perfil de la cuenta.
 
-En Supabase, las direcciones de confirmación de correo deben permitir el sitio publicado y los orígenes locales que se usen para probar.
+La clase 9 usa `select`, `insert`, `update`, `delete`, `ref`, `onMounted` y políticas con `auth.uid()`. La clase 11 usa `signUp`, `signInWithPassword`, `getSession`, `signOut` y `router.beforeEach`. La subida de archivos a Storage complementa esos ejemplos; no es una copia literal de la práctica de tareas.
+
+Cada cuenta puede modificar y eliminar solamente sus productos; los usuarios conectados pueden leer el catálogo. Las fotos publicadas son públicas. No subir imágenes privadas.
+
+En Supabase, las direcciones de confirmación deben permitir el sitio publicado y las direcciones locales que se usen para probar.
+
+Para comprobarlo: iniciar sesión, publicar un objeto, revisar que aparezca en Mis publicaciones y en la tabla `producto`, recargar la página, editarlo y eliminarlo. La verificación con cuentas reales se hace aparte de las pruebas locales.
 
 ## Preparar una publicación
 

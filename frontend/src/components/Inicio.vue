@@ -1,12 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import CrearProducto from './CrearProducto.vue'
+import { useRouter } from 'vue-router'
 import ProductosInicio from './ProductosInicio.vue'
 import PersonasInicio from './PersonasInicio.vue'
 import { categorias } from '../datos/categorias.js'
 
 defineProps({ usuario: { type: Object, required: true }, cerrando: Boolean, errorSesion: String })
 defineEmits(['cerrar-sesion'])
+const router = useRouter()
 const seccion = ref('inicio')
 const categoriaActiva = ref(0)
 const carrusel = ref(null)
@@ -19,14 +20,14 @@ function irCategoria(indice) {
   carrusel.value?.scrollTo({ left: indice * carrusel.value.clientWidth, behavior: 'smooth' })
 }
 function navegar(destino) {
+  if (destino === 'crear') return router.push({ name: 'publicar' })
   seccion.value = destino
   window.scrollTo({ top: 0, behavior: 'instant' })
 }
 </script>
 
 <template>
-  <CrearProducto v-if="seccion === 'crear'" @volver="navegar('inicio')" />
-  <div v-else class="inicio">
+  <div class="inicio">
     <template v-if="seccion === 'inicio'">
       <header class="inicio-header">
         <span class="inicio-marca">Gatherly<sup>©</sup></span>
@@ -62,6 +63,7 @@ function navegar(destino) {
       <h1>Hola, {{ usuario.user_metadata?.nombre || 'qué bueno verte' }}.</h1>
       <p>{{ usuario.email }}</p>
       <button class="inicio-cuenta-publicar" type="button" @click="navegar('crear')">Preparar una publicación →</button>
+      <button class="inicio-mis-productos" type="button" @click="router.push({ name: 'mis-publicaciones' })">Mis publicaciones →</button>
       <button class="inicio-salir" type="button" :disabled="cerrando" @click="$emit('cerrar-sesion')">{{ cerrando ? 'Cerrando sesión…' : 'Cerrar sesión' }}</button>
       <p v-if="errorSesion" role="alert">{{ errorSesion }}</p>
     </section>
@@ -120,6 +122,7 @@ function navegar(destino) {
 .inicio-cuenta > p { font: 14px 'SF Regular', sans-serif; }
 .inicio-cuenta button { display: block; min-height: 48px; padding: 12px 16px; border: 0; font: 14px 'SF Regular', sans-serif; margin-top: 24px; }
 .inicio-cuenta-publicar { background: #bb592f; color: white; width: 100%; }
+.inicio-mis-productos { background: #fff8e9; width: 100%; text-align: left; }
 .inicio-salir { background: none; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .categorias-carrusel { scroll-behavior: auto; } }
 </style>
