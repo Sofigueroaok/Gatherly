@@ -1,0 +1,955 @@
+/* ========================================
+   GATHERLY — IDENTIDAD VISUAL
+======================================== */
+
+/* FUENTES */
+
+@font-face {
+  font-family: "Busorama";
+  src: url("./assets/fonts/ITC-Busorama.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITC Avant";
+  src: url("./assets/fonts/ITC-Avant-Gothic.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITC Avant Bold";
+  src: url("./assets/fonts/ITC-Avant-Bold.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITC Avant Medium";
+  src: url("./assets/fonts/ITC-Avant-Medium.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Light";
+  src: url("./assets/fonts/SF-Light.ttf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Bold";
+  src: url("./assets/fonts/SF-Bold.OTF") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Regular";
+  src: url("./assets/fonts/SF-Regular.OTF") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Medium";
+  src: url("./assets/fonts/SF-Medium.OTF") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Italic";
+  src: url("./assets/fonts/SF-Italic.OTF") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Helvetica Bold";
+  src: url("./assets/fonts/Helvetica-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Helvetica Regular";
+  src: url("./assets/fonts/Helvetica-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("./assets/fonts/SpaceGrotesk.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITC Bauhaus Demi";
+  src: url("./assets/fonts/ITC-Bauhaus-Demi.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITC Kabel Medium";
+  src: url("./assets/fonts/ITCKabel-Medium.TTF") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITC Kabel Bold";
+  src: url("./assets/fonts/ITCKabelStdBold.TTF") format("truetype");
+  font-display: swap;
+}
+
+/* VARIABLES */
+
+:root {
+  --papel: #f2e9d9;
+  --tinta: #30231e;
+  --naranja: #bb592f;
+  --naranja-oscuro: #a54a29;
+  --linea: #d1c3ad;
+
+  --intensidad-grano: 0.16;
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  color: var(--tinta);
+  background: #ded3bd;
+
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* RESET */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 280px;
+}
+
+body {
+  margin: 0;
+}
+
+body.panel-gatherly-abierto {
+  overflow: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--naranja);
+  outline-offset: 3px;
+}
+
+/* CONTENEDOR MOBILE FIRST */
+
+.gatherly {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 480px;
+  min-height: 100svh;
+
+  margin: 0 auto;
+  overflow: hidden;
+
+  background: var(--papel);
+}
+
+/* TEXTURA GLOBAL DE IMPRESIÓN */
+
+.gatherly::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 10;
+
+  pointer-events: none;
+
+  opacity: var(--intensidad-grano);
+
+  mix-blend-mode: multiply;
+
+  background-image: url(
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.7'/%3E%3C/svg%3E"
+  );
+
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+/* PORTADA */
+
+.portada {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  min-height: 100svh;
+
+  overflow: hidden;
+  background: url('./assets/images/onboarding-camara.png') center top / cover no-repeat;
+}
+
+/* El papel continúa hasta arriba aunque la foto esté desplazada. */
+
+.portada-herramientas {
+  background-image: url('./assets/images/onboarding-tool.png');
+}
+
+.portada-superblow {
+  background-image: url('./assets/images/onboarding-superblow.png');
+}
+
+/* FOTOGRAFÍA */
+
+.portada-imagen {
+  position: absolute;
+
+  top: 12px;
+  left: -9%;
+  z-index: 0;
+
+  display: block;
+
+  width: 109.5%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center 36%;
+  mask-image: linear-gradient(to bottom, transparent, #000 10px);
+}
+
+/* VIÑETA SUAVE */
+
+.portada-vineta {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(241, 230, 207, 0.03) 0%,
+    transparent 28%,
+    transparent 70%,
+    rgba(39, 25, 16, 0.12) 100%
+  );
+}
+
+/* CONTENIDO DE PORTADA */
+
+.portada-contenido {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-height: 100svh;
+
+  padding:
+    22px 22px
+    max(14px, env(safe-area-inset-bottom));
+}
+
+/* CABECERA */
+
+.portada-folio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-bottom: 14px;
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 11px;
+}
+
+.portada-folio button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 0 8px 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.marca-copyright {
+  margin-left: 4px;
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: normal;
+  vertical-align: top;
+  -webkit-text-stroke: 0;
+}
+
+/* Estos tamaños se pueden ajustar sin tocar los formularios. */
+.portada-cabecera {
+  max-width: 310px;
+  text-align: left;
+  font-family: "SF Bold", Arial, sans-serif;
+  color: #191714;
+}
+
+.portada-introduccion {
+  font-family: "SF Regular", Arial, sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.portada-titulo {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.portada-descripcion {
+  font-family: "SF Light", Arial, sans-serif;
+  font-weight: 400;
+  margin: 13px 0 0;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: -0.05em; /* Espaciado de -5%. */
+}
+
+.marca {
+  -webkit-text-stroke: 0.35px currentColor;
+  display: inline-block;
+  margin-top: 13px;
+  font-family: "Busorama", Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* ACCESOS */
+
+.portada-acciones {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: auto;
+}
+
+.boton-siguiente {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  min-height: 44px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 3px;
+  background: #191714;
+  color: #fff9ed;
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.boton-siguiente:hover {
+  background: #34302a;
+}
+
+.boton-siguiente:active {
+  transform: translateY(1px);
+}
+
+/* Solo la cámara: figura más grande y más abajo. */
+.portada:not(.portada-herramientas):not(.portada-superblow) .portada-imagen {
+  top: 32px;
+  transform: scale(1.1);
+  transform-origin: center top;
+}
+
+/* Ajustes exclusivos de la segunda página. */
+.portada-herramientas .portada-imagen {
+  top: 40px;
+  left: 0;
+  width: 100%;
+  transform: scale(1.12);
+  transform-origin: center top;
+}
+
+/* Encuadre exclusivo de la tercera página. */
+.portada-superblow .portada-imagen {
+  top: 30px;
+  left: 0;
+  width: 100%;
+}
+
+.portada-acciones-doble {
+  justify-content: space-between;
+}
+
+.portada-acciones-doble .boton-anterior,
+.portada-acciones-doble .boton-siguiente {
+  width: 128px;
+  min-height: 44px;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 14px;
+}
+
+.boton-anterior {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1px solid #191714;
+  background: #f8f1df;
+  border-radius: 3px;
+  color: #191714;
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+/* FONDO OSCURECIDO */
+
+.velo-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  width: 100%;
+
+  border: none;
+
+  background: rgba(36, 24, 18, 0.4);
+
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.velo-enter-active,
+.velo-leave-active {
+  transition: opacity 350ms ease;
+}
+
+.velo-enter-from,
+.velo-leave-to {
+  opacity: 0;
+}
+
+/* PANEL DESLIZABLE */
+
+.panel-acceso {
+  position: absolute;
+  z-index: 5;
+
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: min(760px, 92svh);
+  max-height: 92dvh;
+
+  overflow: hidden;
+  overscroll-behavior: contain;
+
+  padding:
+    0 24px
+    calc(18px + env(safe-area-inset-bottom));
+
+  border-radius: 25px 25px 0 0;
+
+  background: rgba(248, 241, 223, 0.90);
+  border: 1px solid rgba(255, 250, 238, 0.65);
+  border-bottom: 0;
+  backdrop-filter: blur(22px) saturate(115%);
+  -webkit-backdrop-filter: blur(22px) saturate(115%);
+  color: var(--tinta);
+
+  box-shadow:
+    0 -16px 60px rgba(32, 19, 12, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel-acceso::-webkit-scrollbar {
+  display: none;
+}
+
+/* ANIMACIÓN SWIPE UP */
+
+.deslizar-enter-active {
+  transition:
+    transform 530ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.deslizar-leave-active {
+  transition:
+    transform 320ms cubic-bezier(0.55, 0, 1, 0.55);
+}
+
+.deslizar-enter-from,
+.deslizar-leave-to {
+  transform: translateY(105%);
+}
+
+/* TIRADOR */
+
+.panel-zona-gesto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 33px;
+
+  touch-action: pan-y;
+}
+
+.panel-tirador {
+  width: 38px;
+  height: 4px;
+
+  border-radius: 4px;
+
+  background: #bcab97;
+}
+
+/* CABECERA DEL PANEL */
+
+.panel-cabecera {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  border: 0;
+}
+
+.panel-cerrar {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  color: var(--tinta);
+
+  font-family: Arial, sans-serif;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.panel-cerrar:hover {
+  background: #e6d8c5;
+}
+
+/* TEXTOS DEL PANEL */
+
+.panel-cuerpo {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 33px);
+  min-height: 0;
+}
+
+.panel-desplazable {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 12px;
+  padding: 2px 0 8px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel-desplazable::-webkit-scrollbar {
+  display: none;
+}
+
+.panel-desplazable > * {
+  flex-shrink: 0;
+}
+
+.panel-intro {
+  flex-shrink: 0;
+  margin: 12px 0 18px;
+}
+
+.panel-numero {
+  margin: 0 0 12px;
+
+  color: var(--naranja);
+
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.panel-titulo {
+  max-width: 380px;
+
+  margin: 0;
+
+  font-family: "SF Bold", Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.panel-subtitulo {
+  max-width: 340px;
+
+  margin: 13px 0 0;
+
+  color: #68584d;
+
+  font-family: "SF Light", Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+  text-wrap: pretty;
+}
+
+/* FORMULARIOS */
+
+.acceso-secundario {
+  margin-top: 28px;
+}
+
+.acceso-alternativo,
+.proveedores-pendientes {
+  margin: 0 0 10px;
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 12px;
+  text-align: center;
+  color: #68584d;
+}
+
+.proveedores-pendientes {
+  margin: 8px 0 0;
+  font-size: 10px;
+}
+
+.metodos-acceso {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.boton-metodo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  border: 1px solid #b9a995;
+  border-radius: 3px;
+  background: rgba(255, 250, 240, 0.55);
+  color: var(--tinta);
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  text-align: left;
+}
+
+.boton-metodo img {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.boton-metodo:disabled {
+  cursor: default;
+}
+
+.boton-metodo:not(:disabled):hover {
+  border-color: var(--naranja);
+}
+
+.otros-metodos {
+  align-self: flex-start;
+  min-height: 44px;
+  margin: -10px 0 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tinta);
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.campo label {
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.campo input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #b9a995;
+  border-radius: 3px;
+
+  background: rgba(255, 250, 240, 0.55);
+  color: var(--tinta);
+
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+
+  transition: border-color 180ms ease;
+}
+
+.campo input::placeholder {
+  color: #857666;
+  opacity: 1;
+}
+
+.campo input:focus {
+  border-color: var(--naranja);
+}
+
+/* CONTRASEÑA */
+
+.password-contenedor {
+  position: relative;
+}
+
+.password-contenedor input {
+  padding-right: 85px;
+}
+
+.ver-password {
+  position: absolute;
+
+  top: 2px;
+  right: 4px;
+
+  min-width: 72px;
+  min-height: 43px;
+
+  padding: 6px;
+
+  border: none;
+
+  background: transparent;
+  color: var(--tinta);
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.olvidaste-password {
+  align-self: flex-end;
+  min-height: 44px;
+  margin: -10px 0 -12px;
+  padding: 8px 0 8px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--naranja-oscuro);
+  font-family: "SF Regular", Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* BOTÓN DEL FORMULARIO */
+
+.boton-enviar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 49px;
+
+  margin-top: 7px;
+  padding: 13px 18px;
+
+  border: none;
+  border-radius: 3px;
+
+  background: var(--naranja);
+  color: #fff7e9;
+
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.boton-enviar:hover {
+  background: var(--naranja-oscuro);
+}
+
+.boton-enviar:active {
+  transform: translateY(1px);
+}
+
+/* CAMBIAR DE FORMULARIO */
+
+.panel-cambio {
+  margin: auto 0 0;
+  padding-top: 8px;
+  font-family: "SF Regular", Arial, sans-serif;
+
+  font-size: 13px;
+  text-align: center;
+}
+
+.panel-cambio button {
+  min-height: 44px;
+
+  padding: 7px 3px;
+
+  border: none;
+
+  background: transparent;
+  color: var(--naranja-oscuro);
+
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* MENSAJES DEL FORMULARIO */
+
+.mensaje {
+  margin: 17px 0 0;
+  padding: 14px;
+
+  border-left: 3px solid var(--naranja);
+
+  background: #e7dac5;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* TRANSICIÓN LOGIN / REGISTRO */
+
+.cambiar-formulario-enter-active,
+.cambiar-formulario-leave-active {
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.cambiar-formulario-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.cambiar-formulario-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* RESPONSIVE */
+
+/* ESCRITORIO */
+
+@media (min-width: 700px) {
+  .gatherly {
+    box-shadow:
+      0 14px 65px rgba(48, 35, 30, 0.18);
+  }
+}
+
+/* CELULARES ANGOSTOS */
+
+@media (max-width: 360px) {
+  .portada-contenido {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .panel-acceso {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
+
+/* PANTALLAS DE POCA ALTURA */
+
+@media (max-height: 560px) {
+  .portada-contenido {
+    padding-top: 15px;
+  }
+
+  .panel-acceso {
+    max-height: 95dvh;
+  }
+}
+
+/* ACCESIBILIDAD */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
