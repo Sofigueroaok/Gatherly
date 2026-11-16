@@ -63,6 +63,11 @@ function navegar(destino) {
       <h1>Hola, {{ usuario.user_metadata?.nombre || 'qué bueno verte' }}.</h1>
       <p>{{ usuario.email }}</p>
       <button class="inicio-cuenta-publicar" type="button" @click="navegar('crear')">Preparar una publicación →</button>
+
+      <!--Panel de Administración-->
+      <button class="inicio-cuenta-publicar" type="button" @click="router.push({ name: 'admin' })"> Ver Panel
+      </button>
+      
       <button class="inicio-mis-productos" type="button" @click="router.push({ name: 'mis-publicaciones' })">Mis publicaciones →</button>
       <button class="inicio-salir" type="button" :disabled="cerrando" @click="$emit('cerrar-sesion')">{{ cerrando ? 'Cerrando sesión…' : 'Cerrar sesión' }}</button>
       <p v-if="errorSesion" role="alert">{{ errorSesion }}</p>
